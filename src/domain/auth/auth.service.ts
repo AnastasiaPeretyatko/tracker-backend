@@ -42,7 +42,6 @@ export class AuthService {
   private generateToken(user: User): string {
     const payload = { email: user.email, id: user.id };
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     return this.jwtService.sign(payload, {
       secret: process.env.JWT_ACCESS_TOKEN_SECRET_KEY,
     });
@@ -51,15 +50,12 @@ export class AuthService {
   private async validateUser(dto: LoginDto) {
     const { email, password } = dto;
     const user = await this.userService.findOneWithPassword(email);
-
     if (!user) throw ApiException.unauthorized('Invalid credentials');
 
     const passwordEquals = await user.validatePassword(password);
-
     if (!passwordEquals) throw ApiException.unauthorized('Invalid credentials');
 
     delete user.password;
-
     return user;
   }
 }
