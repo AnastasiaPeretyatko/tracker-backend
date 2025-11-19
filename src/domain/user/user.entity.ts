@@ -8,7 +8,7 @@ import {
 } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 
-@Entity()
+@Entity('user')
 export class User {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -23,8 +23,9 @@ export class User {
 
   @Column({
     nullable: false,
+    select: false,
   })
-  password: string;
+  password?: string;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
