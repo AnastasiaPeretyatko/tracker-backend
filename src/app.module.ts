@@ -3,11 +3,13 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import * as dotenv from 'dotenv';
+import { User } from './domain/user';
+import { AuthModule } from './domain/auth';
+import { UserModule } from './domain/user/user.module';
 dotenv.config();
 
 @Module({
   imports: [
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',
@@ -18,13 +20,14 @@ dotenv.config();
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
         type: 'postgres',
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
         url: configService.get('DATABASE_URL'),
-        entities: [],
+        entities: [User],
         migrations: [],
         synchronize: true,
       }),
     }),
+    AuthModule,
+    UserModule,
   ],
 })
 export class AppModule {}
