@@ -23,11 +23,11 @@ migration-create:
 		echo "Пример: make migration-create name=AddUserTable"; \
 		exit 1; \
 	fi
-	@echo "${YELLOW}Создаём миграцию: $(name)${RESET}"
-	@npx typeorm migration:create ./src/db/migrations/$(name)
+	@echo "${GREEN}Создаём миграцию: $(name)${RESET}"
+	@npx typeorm migration:create ./db/migrations/$(name)
 
 migration-run:
-	@echo "${YELLOW}Выполнение миграции...${RESET}"
+	@echo "${GREEN}Выполнение миграции...${RESET}"
 	npm run migration:run
 
 migration-revert:

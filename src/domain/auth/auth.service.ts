@@ -16,6 +16,9 @@ export class AuthService {
   ) {}
 
   async login(dto: LoginDto) {
+    const candidate = await this.userService.findByEmail(dto.email);
+    if (!candidate) throw ApiException.badRequest('User not found');
+
     const user = await this.validateUser(dto);
 
     if (!user) throw ApiException.unauthorized('Invalid credentials');
@@ -43,7 +46,7 @@ export class AuthService {
     const payload = { email: user.email, id: user.id };
 
     return this.jwtService.sign(payload, {
-      secret: process.env.JWT_ACCESS_TOKEN_SECRET_KEY,
+      secret: process.env.JWT_ACCESS_TOKEN_SECRET_KEY || 'Secret',
     });
   }
 

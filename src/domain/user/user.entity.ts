@@ -3,10 +3,13 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import * as bcrypt from 'bcrypt';
+import { Task } from '../tasks/tasks.entity';
+import { TaskLog } from '../task_log/task_log.entity';
 
 @Entity('user')
 export class User {
@@ -33,6 +36,12 @@ export class User {
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
 
+  @OneToMany(() => Task, (task) => task.owner)
+  tasks: Task[];
+
+  @OneToMany(() => TaskLog, (task) => task.user)
+  taskLog: TaskLog;
+
   @BeforeInsert()
   async hashPassword() {
     if (this.password) {
@@ -42,7 +51,6 @@ export class User {
 
   // Удобный метод для проверки пароля (instance method)
   async validatePassword(plainPassword: string): Promise<boolean> {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     return await bcrypt.compare(plainPassword, this.password);
   }
 }
