@@ -10,7 +10,7 @@ YELLOW := $(shell tput -Txterm setaf 3)
 RESET  := $(shell tput -Txterm sgr0)
 
 # Основные команды
-dev:
+run:
 	npm run start:dev
 
 install: 

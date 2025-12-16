@@ -11,11 +11,10 @@ export class TaskScheduleService {
   ) {}
 
   async create(dto: Partial<TaskSchedule>) {
-    this.taskScheduleRepository.create({
-      ...dto,
-    });
+    const taskSchedule = this.taskScheduleRepository.create(dto);
+    await this.taskScheduleRepository.save(taskSchedule);
 
-    return await this.taskScheduleRepository.save(dto);
+    return taskSchedule;
   }
 
   async findOneById(id: string) {

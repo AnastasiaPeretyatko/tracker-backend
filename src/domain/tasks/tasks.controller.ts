@@ -10,8 +10,8 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { TasksService } from './tasks.service';
+import { CreateTaskDto, UpdateTaskDto } from './dto';
 import { JwtAuthGuard } from '../auth';
-import { CreateTaskDto } from './dto';
 
 @Controller('tasks')
 export class TasksController {
@@ -35,12 +35,11 @@ export class TasksController {
     return await this.tasksService.delete(user.id, id);
   }
 
-  @UseGuards(JwtAuthGuard)
   @Patch(':id')
   async update(
     @Req() { user },
     @Param('id') id: string,
-    @Body() body: CreateTaskDto,
+    @Body() body: UpdateTaskDto,
   ) {
     return await this.tasksService.update(user.id, id, body);
   }

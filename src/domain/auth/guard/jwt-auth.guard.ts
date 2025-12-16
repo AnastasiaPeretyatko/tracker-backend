@@ -1,11 +1,7 @@
-import {
-  CanActivate,
-  ExecutionContext,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Observable } from 'rxjs';
+import { ApiException } from 'src/common/exceptions/api.exceptions';
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
@@ -22,7 +18,7 @@ export class JwtAuthGuard implements CanActivate {
       const token = authHeader.split(' ')[1];
 
       if (bearer !== 'Bearer' || !token || typeof token !== 'string') {
-        throw new UnauthorizedException({ message: 'User is not authorized' });
+        throw ApiException.unauthorized('User is not authorized');
       }
 
       const user = this.jwtService.verify(token, {
@@ -32,7 +28,7 @@ export class JwtAuthGuard implements CanActivate {
       return true;
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
-      throw new UnauthorizedException({ message: 'User is not authorized' });
+      throw ApiException.unauthorized('User is not authorized');
     }
   }
 }

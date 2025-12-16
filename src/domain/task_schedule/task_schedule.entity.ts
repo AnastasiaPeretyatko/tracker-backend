@@ -1,12 +1,5 @@
-import {
-  Column,
-  Entity,
-  JoinColumn,
-  OneToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { TASK_SCHEDULE_TYPE } from 'src/common/enum';
-import { Task } from '../tasks';
 
 @Entity('task_schedule')
 export class TaskSchedule {
@@ -28,18 +21,9 @@ export class TaskSchedule {
   @Column({ array: true, nullable: true, type: 'int' })
   weekdays?: number[];
 
-  @Column({ name: 'specific_dates', array: true, nullable: true, type: 'int' })
-  specificDates?: number[];
+  @Column({ name: 'specific_dates', array: true, nullable: true, type: 'date' })
+  specificDates?: Date[];
 
   @Column({ name: 'created_at', type: 'timestamp', default: 'now()' })
   createdAt: Date;
-
-  @Column({ name: 'task_id', nullable: false })
-  taskId: string;
-
-  @OneToOne(() => Task, (task) => task.taskSchedule, {
-    onDelete: 'CASCADE',
-  })
-  @JoinColumn({ name: 'task_id' })
-  task: Task;
 }

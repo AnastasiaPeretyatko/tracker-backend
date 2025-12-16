@@ -9,7 +9,7 @@ import {
 } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { Task } from '../tasks/tasks.entity';
-import { TaskLog } from '../task_log/task_log.entity';
+// import { TaskLog } from '../task_log/task_log.entity';
 
 @Entity('user')
 export class User {
@@ -39,8 +39,8 @@ export class User {
   @OneToMany(() => Task, (task) => task.owner)
   tasks: Task[];
 
-  @OneToMany(() => TaskLog, (task) => task.user)
-  taskLog: TaskLog;
+  // @OneToMany(() => TaskLog, (task) => task.user)
+  // taskLog: TaskLog;
 
   @BeforeInsert()
   async hashPassword() {

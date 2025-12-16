@@ -5,8 +5,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Task } from '../tasks';
-import { User } from '../user';
+import { Task } from '../tasks/tasks.entity';
 
 @Entity('task_log')
 export class TaskLog {
@@ -22,17 +21,17 @@ export class TaskLog {
   @Column({ name: 'completed_at', nullable: true })
   completedAt: Date;
 
-  @Column()
+  @Column({ name: 'task_id', nullable: false })
   taskId: string;
 
-  @Column()
+  @Column({ name: 'user_id', nullable: false })
   userId: string;
 
   @ManyToOne(() => Task, (task) => task.taskLogs)
   @JoinColumn({ name: 'task_id' })
   task: Task;
 
-  @ManyToOne(() => User, (user) => user.taskLog)
-  @JoinColumn({ name: 'user_id' })
-  user: Task[];
+  // @ManyToOne(() => User, (user) => user.taskLog)
+  // @JoinColumn({ name: 'user_id' })
+  // user: User[];
 }

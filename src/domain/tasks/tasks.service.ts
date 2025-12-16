@@ -2,47 +2,45 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Task } from './tasks.entity';
 import { Repository } from 'typeorm';
-import { CreateTaskDto } from './dto';
+import { CreateTaskDto, UpdateTaskDto } from './dto';
 import { ApiException } from 'src/common/exceptions/api.exceptions';
-import { TaskSchedule } from '../task_schedule/task_schedule.entity';
 import { TaskScheduleService } from '../task_schedule';
 
 @Injectable()
 export class TasksService {
   constructor(
-    @InjectRepository(Task) private taskRepository: Repository<Task>,
-    @InjectRepository(TaskSchedule)
-    private taskScheduleRepository: Repository<TaskSchedule>,
+    @InjectRepository(Task)
+    private readonly taskRepository: Repository<Task>,
     private readonly taskScheduleService: TaskScheduleService,
   ) {}
-
-  async findAll(userId: string) {
-    return await this.taskRepository.find({
-      where: { ownerId: userId },
-    });
-  }
 
   async findOneById(id: string) {
     return await this.taskRepository
       .createQueryBuilder('task')
       .leftJoinAndSelect('task.taskSchedule', 'taskSchedule')
+      .leftJoinAndSelect('task.taskLogs', 'taskLogs')
       .where('task.id = :id', { id })
       .getOne();
   }
 
   async create(userId: string, body: CreateTaskDto) {
+    const { title, description, ...scheduleData } = body;
+
+    const task_schedule = await this.taskScheduleService.create(scheduleData);
+
     const task = this.taskRepository.create({
-      title: body.title,
-      description: body.description,
+      title,
+      description,
       ownerId: userId,
+      taskSchedule: task_schedule,
     });
 
     await this.taskRepository.save(task);
 
-    return await this.findOneById(task.id);
+    return this.findOneById(task.id);
   }
 
-  async update(userId: string, taskId: string, body: CreateTaskDto) {
+  async update(userId: string, taskId: string, body: UpdateTaskDto) {
     const task = await this.findOneById(taskId);
     if (!task) throw ApiException.notFound('Task not found');
 
@@ -71,18 +69,14 @@ export class TasksService {
     };
   }
 
-  async createTaskSchedule(userId: string, dto: any) {
-    const task = await this.create(userId, dto);
-
-    if (!task) throw ApiException.notFound('Task not found');
-
-    const taskSchedule = await this.taskScheduleService.create({
-      taskId: task.id,
-      ...dto,
-    });
-
-    if (!taskSchedule) throw ApiException.notFound('Task schedule not found');
-
-    return await this.findOneById(task.id);
+  async findAll(userId: string) {
+    return await this.taskRepository
+      .createQueryBuilder('task')
+      .leftJoinAndSelect('task.taskSchedule', 'taskSchedule')
+      .leftJoinAndSelect('task.taskLogs', 'taskLogs')
+      .where('task.owner_id = :ownerId', { ownerId: userId })
+      .andWhere('task.is_active = :isActive', { isActive: true })
+      .orderBy('taskLogs.date', 'ASC')
+      .getMany();
   }
 }

@@ -8,23 +8,22 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { User } from '../user';
-import { TaskSchedule } from '../task_schedule/task_schedule.entity';
+import { TaskSchedule } from '../task_schedule';
 import { TaskLog } from '../task_log/task_log.entity';
+// import { TaskLog } from '../task_log/task_log.entity';
 
 @Entity('task')
 export class Task {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  // FK поле
   @Column({ name: 'owner_id', nullable: false })
   ownerId: string;
 
-  // связь с User
   @ManyToOne(() => User, (user) => user.tasks, {
     onDelete: 'CASCADE',
   })
-  @JoinColumn({ name: 'owner_id' }) // указываем, какой столбец является FK
+  @JoinColumn({ name: 'owner_id' })
   owner: User;
 
   @Column({ nullable: false })
@@ -45,9 +44,15 @@ export class Task {
   @Column({ name: 'deleted_at', nullable: true })
   deletedAt?: Date;
 
-  @OneToOne(() => TaskSchedule, (taskSchedule) => taskSchedule.task)
+  @Column({ name: 'task_schedule_id', nullable: true })
+  taskScheduleId: string;
+
+  // связь с TaskSchedule
+  @OneToOne(() => TaskSchedule)
+  @JoinColumn({ name: 'task_schedule_id' }) // указываем, какой столбец является FK
   taskSchedule: TaskSchedule;
 
+  // связь с TaskLog
   @OneToMany(() => TaskLog, (taskLog) => taskLog.task)
   taskLogs: TaskLog[];
 }
